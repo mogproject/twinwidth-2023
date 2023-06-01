@@ -37,26 +37,16 @@ COV_PY=$(COV_PY_DIR)/lcov.info
 COV_HTML=coverage/html
 COV_MERGED=coverage/lcov.info
 
-SRC_PY=src/main/python
-TEST_PY=src/test/python
-STUB_PY=src/stubs
-
-PYTEST_OPTS=""  # --full-trace
-
-export PYTHONPATH=$(PWD)/$(SRC_PY)
-export MYPYPATH=$(PWD)/$(STUB_PY)
-
-PROFILE_ON ?= false
-TRACE_ON ?= false
-LOGGING_ON ?= false
 
 build:
-	cd $(SRC_CPP) && $(CMAKE) -S . -B "$(BUILD_DIR)/Release" $(CMAKE_OPTS) -DCMAKE_BUILD_TYPE=Release -DPROFILE_ON=$(PROFILE_ON) -DTRACE_ON=$(TRACE_ON) -DLOGGING_ON=$(LOGGING_ON)
+	cd $(SRC_CPP) && $(CMAKE) -S . -B "$(BUILD_DIR)/Release" $(CMAKE_OPTS) -DCMAKE_BUILD_TYPE=Release
 	cd $(SRC_CPP) && $(CMAKE) --build "$(BUILD_DIR)/Release"
+	$(CP) -f build/Release/$(EXACT_SOLVER_BIN) dist/
+	@echo "Created: dist/$(EXACT_SOLVER_BIN)"
 
 clean:
 	@echo "Cleaning..."
-	@$(RM) -rf build/* coverage/*
+	@$(RM) -rf build/* dist/*
 	@echo "Cleaning done."
 
 publish:
