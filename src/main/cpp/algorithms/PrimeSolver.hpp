@@ -130,8 +130,8 @@ class PrimeSolver {
     auto aps = sep.find_articulation_points(graph_);
 
     upperbound::UBSeparate<T> ub_separate(trigraph, result_, aps);
-    // ub_separate.run(10, rand, 0);
-    // if (result_.resolved()) return;
+    ub_separate.run(10, rand, 0);
+    if (result_.resolved()) return;
 
     lowerbound::LBSeparate<T> lb_separate(lb_manager, aps);
     lb_separate.run(20, 0, rand);  // level 0
