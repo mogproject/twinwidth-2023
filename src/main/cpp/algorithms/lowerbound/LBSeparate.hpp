@@ -87,7 +87,7 @@ class LBSeparate {
         // separator not found; sample vertices
         int num_samples = std::max(lb_manager_.result().lower_bound() * 2 + 4, lb_manager_.get_sample_size(alg_level));
         // log_trace("%s LBSeparate separator not found; sampling: n=%d, nsamples=%d, t=%d",
-        //           lb_manager_.result().to_string().c_str(), n, num_samples, iteration_id);
+        //           lb_manager_.result().to_string().c_str(), lb_manager_.get_graph().number_of_nodes(), num_samples, iteration_id);
         vertices = convert_vertex_labels(sample_degree_weighted(g, num_samples, rand), vertices);
         last_loop = true;
       }
@@ -205,16 +205,13 @@ class LBSeparate {
     }
 
     // add spike and separator to the frozen vertices
+    if (fs_.get(spike)) next_frozen.push_back(spike);
+
     for (auto x : s) {
       if (fs_.get(x)) next_frozen.push_back(x);
     }
 
     frozen_vertices = next_frozen;
-
-    // if (spike >= 0) {
-    //   vertices.push_back(spike);
-    frozen_vertices.push_back(spike);
-    // }
 
     // printf("f1separate\n");
     return true;
