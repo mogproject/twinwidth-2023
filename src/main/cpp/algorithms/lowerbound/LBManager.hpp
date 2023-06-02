@@ -105,7 +105,7 @@ class LBManager {
         run_core(g, info, 40, hash == hash_all_);
         if (info.resolved()) break;
 
-        run_branch(t, info, 36, 2, 10000000LL);  // 10^7
+        run_branch(t, info, 36, 1, 10000000LL);  // 10^7
         if (info.resolved()) break;
 
         run_direct(g, info, 23, 120);

@@ -177,7 +177,7 @@ class PrimeSolver {
       ub_separate.run(50, rand, 0);
       if (result_.resolved()) break;
 
-      volatility_rate = std::max(10, volatility_rate / 2);
+      volatility_rate = std::max(100, volatility_rate / 2);
       gsolver.run(rand, greedy_num_iterations, 30, volatility_rate, 0);
     }
   }

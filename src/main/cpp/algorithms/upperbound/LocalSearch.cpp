@@ -52,7 +52,7 @@ static void reset_timeout() {
 
 void LocalSearch::run(util::Random &rand, int time_limit_sec) {
   util::timer_start(localsearch::ALGORITHM_ID);
-  log_info("%s LocalSearch started: time_limit=%ds", result_.to_string().c_str(), time_limit_sec);
+  // log_info("%s LocalSearch started: time_limit=%ds", result_.to_string().c_str(), time_limit_sec);
   timed_out_ = false;
 
   if (time_limit_sec > 0) localsearch::set_timeout(time_limit_sec);
@@ -64,7 +64,7 @@ void LocalSearch::run(util::Random &rand, int time_limit_sec) {
   if (timed_out_) {
     log_error("%s LocalSearch timed out: runtime=%.2fs", result_.to_string().c_str(), util::timer_stop(localsearch::ALGORITHM_ID));
   } else {
-    log_info("%s LocalSearch finished: runtime=%.2fs", result_.to_string().c_str(), util::timer_stop(localsearch::ALGORITHM_ID));
+    // log_info("%s LocalSearch finished: runtime=%.2fs", result_.to_string().c_str(), util::timer_stop(localsearch::ALGORITHM_ID));
   }
 }
 
