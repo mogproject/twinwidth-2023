@@ -25,7 +25,7 @@ class LBManager {
   std::unordered_map<uint64_t, manage::CacheEntry> cache_table_;
   int prev_log_level_;
   uint64_t hash_all_;
-  bool entire_core_done_ = false;
+  int lb_core_counter_ = 0;
 
  public:
   LBManager(T const& trigraph, base::SolverInfo& result) : trigraph_(trigraph), result_(result) {  //
@@ -102,7 +102,7 @@ class LBManager {
         run_branch(t, info, 27, 1, 10000000LL);  // 10^7
         if (info.resolved()) break;
       } else if (lv == 1) {
-        run_core(g, info, 60, hash == hash_all_);
+        run_core(g, info, 40, hash == hash_all_);
         if (info.resolved()) break;
 
         run_branch(t, info, 36, 2, 10000000LL);  // 10^7
@@ -207,13 +207,19 @@ class LBManager {
     }
   }
 
+  //==========================================================================
+  // (5) LBCore
+  //==========================================================================
   void run_core(ds::graph::Graph const& g, base::SolverInfo& info, int time_limit_sec, bool is_entire) {
-    if (entire_core_done_) return;
+    if (g.number_of_nodes() > 123 && lb_core_counter_ >= 2) return;
+    ++lb_core_counter_;
 
     lowerbound::LBCore lb_core(g, info);
+    disable_logging();
     if (lb_core.run(time_limit_sec, false)) {
-      if (is_entire) { entire_core_done_ = true; }
+      if (is_entire) { lb_core_counter_ = 10; }
     }
+    enable_logging();
     result_.update_lower_bound(info.lower_bound());
   }
 

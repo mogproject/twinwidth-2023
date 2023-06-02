@@ -58,7 +58,7 @@ void LocalSearch::run(util::Random &rand, int time_limit_sec) {
   if (time_limit_sec > 0) localsearch::set_timeout(time_limit_sec);
 
   search_red_shift(rand);
-  search_permutation_full();
+  // search_permutation_full();
 
   if (time_limit_sec > 0) localsearch::reset_timeout();
   if (timed_out_) {

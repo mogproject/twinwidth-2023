@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include "algorithms/upperbound/LocalSearch.hpp"
+#include "algorithms/upperbound/LocalSearchPlus.hpp"
 #include "algorithms/upperbound/WeakRedPotential.hpp"
 #include "ds/graph/Graph.hpp"
 #include "ds/graph/TriGraph.hpp"
@@ -168,9 +169,14 @@ class GreedySolver {
 
       if (local_search_enabled_) {
         // local search
-        // log_trace("%s GreedySolver local search: width=%d, t=%d", result_.to_string().c_str(), verify_contraction_sequence(trigraph_.original_graph(), seq), t);
-        LocalSearch ls(trigraph_.original_graph(), result_, seq);
-        ls.search_red_shift(rand);
+        if (trigraph_.number_of_nodes() == trigraph_.original_graph().number_of_nodes() && frozen_vertices_.empty()) {
+          // log_trace("%s GreedySolver local search: width=%d, t=%d", result_.to_string().c_str(), verify_contraction_sequence(trigraph_.original_graph(), seq), t);
+          LocalSearch ls(trigraph_.original_graph(), result_, seq);
+          ls.run(rand, 5);
+        } else {
+          LocalSearchPlus<T> lsp(trigraph_, result_, frozen_vertices_, seq);
+          lsp.run(rand, 5);
+        }
       }
       // log_trace("%s GreedySolver after LS: ub=%d, t=%d", result_.to_string().c_str(), result_.upper_bound(), t);
     }

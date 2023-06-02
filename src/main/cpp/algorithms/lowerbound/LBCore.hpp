@@ -20,7 +20,7 @@ class LBCore {
 
   // true: found the tight bound
   bool run(int time_limit_sec = 0, bool find_smallest_core = false) {
-    log_info("%s LBCore started: time_limit=%ds, small_core=%s", result_.to_string().c_str(), time_limit_sec,
+    log_info("%s LBCore started: n=%d, time_limit=%ds, small_core=%s", result_.to_string().c_str(), graph_.number_of_nodes(), time_limit_sec,
              find_smallest_core ? "True" : "False");
     util::timer_start();
     bool timeout = false;

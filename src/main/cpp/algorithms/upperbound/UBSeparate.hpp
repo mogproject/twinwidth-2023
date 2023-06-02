@@ -381,8 +381,7 @@ class UBSeparate {
     // (1) GreedySolver
     //==========================================================================
 
-    // TODO: enable LocalSearch
-    upperbound::GreedySolver<T> gsolver(trigraph, info, tail, false);
+    upperbound::GreedySolver<T> gsolver(trigraph, info, tail, true);
 
     util::set_log_level(util::logging::CRITICAL);
     gsolver.run(rand, greedy_num_iterations_, greedy_time_limit_, greedy_volatility_rate_, permissiveness_);

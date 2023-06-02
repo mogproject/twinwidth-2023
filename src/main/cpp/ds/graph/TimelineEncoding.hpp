@@ -401,6 +401,7 @@ class TimelineEncoding {
     }
 
     // now, the remaining XOR is the last element
+    // @note This can be just `seq.back().first`.
     vmapping_[total_xor] = n_ - 1;
     vmapping_inv_[n_ - 1] = total_xor;
   }

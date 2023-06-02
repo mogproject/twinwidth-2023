@@ -160,13 +160,11 @@ class PrimeSolver {
     // (8) UBSeparate + Greedy
     //==========================================================================
 
-    greedy_time_limit = 30;
-
     ub_separate.run(20, rand, 0);
     if (result_.resolved()) return;
-    gsolver.run(rand, greedy_num_iterations, greedy_time_limit, volatility_rate, 0);
+    gsolver.run(rand, greedy_num_iterations, 30, volatility_rate, 0);
     if (result_.resolved()) return;
-    gsolver.run(rand, greedy_num_iterations, greedy_time_limit, volatility_rate, 1);
+    gsolver.run(rand, greedy_num_iterations, 10, volatility_rate, 1);
     if (result_.resolved()) return;
 
     //==========================================================================
@@ -178,6 +176,9 @@ class PrimeSolver {
       if (result_.resolved()) break;
       ub_separate.run(50, rand, 0);
       if (result_.resolved()) break;
+
+      volatility_rate = std::max(10, volatility_rate / 2);
+      gsolver.run(rand, greedy_num_iterations, 30, volatility_rate, 0);
     }
   }
 };

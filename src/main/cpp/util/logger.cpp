@@ -51,12 +51,20 @@ void set_log_level(int log_level) { util::logging::log_level = log_level; }
 
 static std::unordered_map<int, std::chrono::time_point<std::chrono::system_clock>> timer_started;
 
-void timer_start(int key) { timer_started[key] = std::chrono::system_clock::now(); }
+void timer_start(int key) {
+#if LOGGING_ON
+  timer_started[key] = std::chrono::system_clock::now();
+#endif
+}
 
 double timer_stop(int key) {
+#if LOGGING_ON
   auto timer_stopped = std::chrono::system_clock::now();
   auto elapsed_cnt = std::chrono::duration_cast<std::chrono::milliseconds>(timer_stopped - timer_started[key]).count();
   return static_cast<double>(elapsed_cnt) / 1000.0;
+#else
+  return 0.0;
+#endif
 }
 
 namespace logging {
