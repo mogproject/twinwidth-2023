@@ -4,7 +4,7 @@ This repository stores the source code of our solver *Caterpie Prime* for the Ex
 
 ### DOI of Version 1
 
-TBD
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7996823.svg)](https://doi.org/10.5281/zenodo.7996823)
 
 ### Solver Description
 
