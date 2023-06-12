@@ -22,12 +22,12 @@
 
 
 \newcommand{\universityOfUtah}{School of Computing, University of Utah, USA}
-\author{David Dursteler}{\universityOfUtah}{u1161522@utah.edu}{https://orcid.org/0009-0000-6471-1504}{}
 \author{Yosuke Mizutani}{\universityOfUtah}{yos@cs.utah.edu}{https://orcid.org/0000-0002-9847-4890}{}
+\author{David Dursteler}{\universityOfUtah}{u1161522@utah.edu}{https://orcid.org/0009-0000-6471-1504}{}
 
-\authorrunning{D. Dursteler et al.} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+\authorrunning{Y. Mizutani et al.} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
 
-\Copyright{David Dursteler and Yosuke Mizutani} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+\Copyright{Yosuke Mizutani and David Dursteler} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
 
 \ccsdesc[100]{Theory of computation → Graph algorithms analysis} %TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
 
@@ -86,11 +86,11 @@ a collection of algorithms to find lower and upper bounds of the twin-width.
 %
 We incorporated the \textsf{Kissat} SAT solver \cite{biere_gimsatul_2022} as a subroutine
 and implemented two novel ideas:
-\emph{timeline encoding} and \emph{caterpie decomposition}.
+\emph{timeline encoding} and \emph{Hydra decomposition}.
 %
-The timeline encoding is a new perspective to compute the width of a given contraction
+The timeline encoding is a new data structure to compute the width of a given contraction
 sequence, enabling faster local search;
-the caterpie decomposition is a divide-and-conquer strategy featuring a small vertex separator.
+the Hydra decomposition is a divide-and-conquer strategy featuring a small vertex separator.
 \end{abstract}
 
 \section{Background}
@@ -109,7 +109,8 @@ Given a trigraph $G$, the \emph{weak red potential} of $u,v \in V(G), u \neq v$
 is the red degree of $u$ after contraction $(u,v)$.
 %
 We further define
-$\triangle(u,v) := N(u) \triangle N(v) \setminus \{u,v\}$ for vertices $u,v$.
+$\triangle(u,v) := N(u) \triangle N(v) \setminus \{u,v\}$ for vertices $u,v$,
+where $\triangle$ denotes the symmetric difference of two sets.
 %
 %
 %
@@ -142,7 +143,7 @@ We utilize the following known facts extensively in our implementation.
 \begin{itemize}
     \item If $G'$ is an induced subgraph of a graph $G$, then $\tww(G') \leq \tww(G)$ \cite{bonnet_twin-width_2020}.
     \item If $\overline{G}$ is the complement graph of a graph $G$, then $\tww(G) = \tww(\overline{G})$ \cite{bonnet_twin-width_2020}.
-    \item $\displaystyle \tww(G) = \max_{P \in \mathcal{P}} \tww(P)$,
+    \item $\displaystyle \tww(G) = \max_{H \in \mathcal{P}} \tww(H)$,
     where $\mathcal{P}$ is a set of prime graphs found in the modular decomposition of $G$ \cite{schidler_sat_2021}.
     \item For a graph $G$, $\displaystyle \min_{u,v\in V(G), u \neq v}|\triangle(u,v)| \leq \tww(G)$ \cite{schidler_sat_2021}.
     \item If every component of a graph $G$ has at most one cycle, then $\tww(G) \leq 2$ \cite{ahn_bounds_2022}.
@@ -200,6 +201,7 @@ An instance of the timeline encoding stores the following data.
     \item $G$: input graph with $n$ vertices.
     \item $\phi: V(G) \to [n]$: bijection that encodes an elimination ordering
     (vertex $v$ is eliminated at time $\phi(v)$ if $\phi(v)<n$).
+    We write $[n]$ for $\{1,\ldots,n\}$.
     \item $p: [n - 1] \to [n]$: encoding of a contraction tree.
     For $i<j$, $p(i)=j$ if vertex $\phi^{-1}(i)$ is merged into vertex $\phi^{-1}(j)$
     (i.e. $j$ is the \emph{parent} of $i$ in the contraction tree).
@@ -215,7 +217,7 @@ introduced at time $t$, defined as:
 $\{\{p(t), k\} \mid k \in \triangle_{>}(p(t), t)\}$.
 %
 Red sources determine the \emph{red intervals},
-non-overlapping, continuous intervals for each red edge, defined as follows:
+non-overlapping, continuous intervals where an edge is red, defined as follows:
 %
 for $i<j$, red source $(i, j)$ at time $t$ creates an interval $[t,i)$
 (red edge $ij$ disappears at time $i$).
@@ -223,7 +225,7 @@ If $p(i) \neq j$, then we recurse this process as if red source $\{p(i), j\}$ wa
 (red edge $ij$ transfers to $\{p(i),j\}$),
 as illustrated in \Cref{fig:timeline}.
 
-Now we aggregate the red intervals by vertices.
+Now we aggregate red intervals by vertices.
 %
 We maintain a \emph{multiset} of intervals for each vertex
 such that a red interval of an edge accounts to its both endpoints.
@@ -231,30 +233,32 @@ such that a red interval of an edge accounts to its both endpoints.
 The maximum number of the overlaps of such intervals gives
 the maximum red degree at a vertex over time.
 %
-Finally, we can obtain the width of the contraction sequence by
+Finally, we obtain the width of the contraction sequence by
 taking the maximum of the red degrees over all vertices.
 %
 A key observation is that we can dynamically compute the number of overlaps of a multiset of
-intervals efficiently with a balanced binary tree (e.g. update and get in time $\mathcal{O}(\log n)$).
+intervals efficiently with a balanced binary tree
+(e.g. modification in time $\mathcal{O}(\log n)$,
+getting the maximum number of overlaps in $\mathcal{O}(1)$, etc.).
 %
-Our implementation supports efficient APIs for modifying a contraction tree
+For local search, we implemented APIs for modifying a contraction tree
 and also updating a bijection $\phi$.
 
 \begin{figure}[t!]
     \centering
     \includegraphics[clip,width=1.0\textwidth,trim={80 3300 80 0}]{images/decomp.png}
-    \caption{Structure of the caterpie (left) and
+    \caption{Structure of the Hydra (left) and
     two examples of separating it into two parts (right).
     }
     \label{fig:decomp} 
 \end{figure}
 
-\section{Caterpie Decomposition}
+\section{Hydra decomposition}
 
-We also implemented a divide-and-conquer strategy \emph{caterpie decomposition},
+We also implemented a divide-and-conquer strategy \emph{Hydra decomposition},
 based on finding a small vertex separator.
 %
-First, define a structured trigraph, the \emph{caterpie},
+First, define a structured trigraph, the \emph{Hydra},
 which consists of a (possibly empty) set of \emph{heads} and
 a (possibly empty) vertex set \emph{tail}.
 %
@@ -264,7 +268,7 @@ All red edges in the trigraph must be incident to one of the top vertices.
 Heads must be vertex-disjoint, but tail may contain vertices from boundary vertices
 (but not a top vertex).
 
-Now, consider partitioning the vertices of a caterpie $C$ into three parts:
+Then, consider partitioning the vertices of a Hydra $H$ into three parts:
 $S, A, B$ such that $S$ separates $A$ from $B$.
 % , i.e. there is no $S$-avoiding path from
 % any vertex in $A$ to any vertex in $B$.
@@ -273,23 +277,24 @@ We also require that $S$ does not contain any vertices from the heads,
 and every vertex in the tail must be in either $S$ or $B$.
 %
 \Cref{fig:decomp} shows two ways of choosing a separator (shaded in light blue)
-of a caterpie.
+of a Hydra.
 
-Notice that $C[A \cup S]$ is seen as another caterpie with $S$ being its tail.
-If we contract all vertices of a caterpie except the tail,
-we will have one vertex left and possibly red edges emanating from it.
+Notice that $H[A \cup S]$ is seen as another Hydra with $S$ being its tail.
+If we contract all vertices of a Hydra except the tail,
+we will have one vertex ($x$) left and possibly red edges ($E_x$) emanating from it.
 %
-We then attach that part as a head to the rest of the trigraph ($C[B \cup S]$)
-so that we can build up the contraction sequence.
+We then take the rest of the trigraph with vertex $x$, i.e. $H[B \cup S \cup \{x\}]$,
+and reattach $E_x$ to it.
+Now $x$ and $S$ forms a new head, and we can build up the contraction sequence.
 %
 As red edges reside only in heads,
 if the size of separators are bounded by $d$,
-the red degree of a caterpie is also upper-bounded by $d$,
+the red degree of a Hydra is also upper-bounded by $d$,
 which helps construct a $d$-contraction sequence part by part.
 %
 For $d=1$ we use a linear-time algorithm to find a vertex separator,
 or a cut vertex (articulation point).
-For $d \leq 2$, we call a SAT solver to find such ones.
+For $d \geq 2$, we call a SAT solver to find such ones.
 
 \section{Algorithms}
 
@@ -309,7 +314,7 @@ The following is a brief description of each algorithm ((*): using a SAT solver)
 \begin{itemize}
     \item Exact algorithms
     \begin{itemize}
-        \item \primetreesolver : Linear-time exact solver for prime trees.
+        \item \primetreesolver : Linear-time exact solver for trees without twins.
         \item \branchsolver : Brute-force solver equipped with caching mechanism and reduction rules.
         \item \directsolver (*): SAT-based solver implementing the relative encoding presented in \cite{schidler_sat_2021}.
     \end{itemize}
@@ -323,7 +328,7 @@ The following is a brief description of each algorithm ((*): using a SAT solver)
         \item \lbsample : Sampling-based algorithm.
         Finds a connected induced subgraph $G'$ of $G$
         by random walk and computes the exact or lower-bound twin-width of $G'$.
-        \item \lbseparate (*): Similar to \lbsample, but uses the caterpie decomposition to
+        \item \lbseparate (*): Similar to \lbsample, but uses the Hydra decomposition to
         find an induced subgraph to check for the lower-bound.
     \end{itemize}
     \item Upper-bound algorithms
@@ -332,7 +337,7 @@ The following is a brief description of each algorithm ((*): using a SAT solver)
         % We add some randomness in later iterations.
         \item \ublocalsearch : Using the timeline encoding, we make small changes to
         the elimination ordering and the contraction tree to see if there is a better solution.
-        \item \ubseparate (*): Divide-and-conquer algorithm using the caterpie decomposition.
+        \item \ubseparate (*): Divide-and-conquer algorithm using the Hydra decomposition.
     \end{itemize}
 \end{itemize}
 
