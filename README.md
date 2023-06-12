@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](http://choosealicense.com/licenses/apache-2.0/)
+
 # Caterpie Prime
 
 This repository stores the source code of our solver *Caterpie Prime* for the Exact track of the [PACE 2023](https://pacechallenge.org/2023/) challenge.
@@ -8,7 +10,7 @@ This repository stores the source code of our solver *Caterpie Prime* for the Ex
 
 ### Solver Description
 
-TBD
+- PDF: https://raw.githubusercontent.com/wiki/mogproject/twinwidth-2023/pace-2023-description.pdf
 
 ### Dependencies
 
