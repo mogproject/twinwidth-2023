@@ -10,7 +10,7 @@ This repository stores the source code of our solver *Caterpie Prime* for the Ex
 
 ### Solver Description
 
-TBD
+- PDF: https://raw.githubusercontent.com/wiki/mogproject/twinwidth-2023/pace-2023-description.pdf
 
 ### Dependencies
 
