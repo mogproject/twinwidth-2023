@@ -1,11 +1,1 @@
-
-
-we model:
-
-Catapie segment
-
-- heads
-- body
-- tail
-
-
+Solver description.

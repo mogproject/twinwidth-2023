@@ -16,7 +16,7 @@
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
 
-\title{Caterpie Prime: An Exact Solver for Twin-width} %TODO Please add
+\title{Hydra Prime: An Exact Solver for Twin-width} %TODO Please add
 
 % \titlerunning{} %TODO optional, please use if title is longer than one line
 
@@ -86,11 +86,11 @@ a collection of algorithms to find lower and upper bounds of the twin-width.
 %
 We incorporated the \textsf{Kissat} SAT solver \cite{biere_gimsatul_2022} as a subroutine
 and implemented two novel ideas:
-\emph{timeline encoding} and \emph{Hydra decomposition}.
+\emph{timeline encoding} and \emph{hydra decomposition}.
 %
 The timeline encoding is a new data structure to compute the width of a given contraction
 sequence, enabling faster local search;
-the Hydra decomposition is a divide-and-conquer strategy featuring a small vertex separator.
+the hydra decomposition is a divide-and-conquer strategy featuring a small vertex separator.
 \end{abstract}
 
 \section{Background}
@@ -241,24 +241,24 @@ intervals efficiently with a balanced binary tree
 (e.g. modification in time $\mathcal{O}(\log n)$,
 getting the maximum number of overlaps in $\mathcal{O}(1)$, etc.).
 %
-For local search, we implemented APIs for modifying a contraction tree
+For local search, we implemented methods for modifying a contraction tree
 and also updating a bijection $\phi$.
 
 \begin{figure}[t!]
     \centering
     \includegraphics[clip,width=1.0\textwidth,trim={80 3300 80 0}]{images/decomp.png}
-    \caption{Structure of the Hydra (left) and
+    \caption{Structure of the hydra (left) and
     two examples of separating it into two parts (right).
     }
     \label{fig:decomp} 
 \end{figure}
 
-\section{Hydra decomposition}
+\section{Hydra Decomposition}
 
-We also implemented a divide-and-conquer strategy \emph{Hydra decomposition},
+We also implemented a divide-and-conquer strategy \emph{hydra decomposition},
 based on finding a small vertex separator.
 %
-First, define a structured trigraph, the \emph{Hydra},
+First, define a structured trigraph, the \emph{hydra},
 which consists of a (possibly empty) set of \emph{heads} and
 a (possibly empty) vertex set \emph{tail}.
 %
@@ -268,7 +268,7 @@ All red edges in the trigraph must be incident to one of the top vertices.
 Heads must be vertex-disjoint, but tail may contain vertices from boundary vertices
 (but not a top vertex).
 
-Then, consider partitioning the vertices of a Hydra $H$ into three parts:
+Then, consider partitioning the vertices of a hydra $H$ into three parts:
 $S, A, B$ such that $S$ separates $A$ from $B$.
 % , i.e. there is no $S$-avoiding path from
 % any vertex in $A$ to any vertex in $B$.
@@ -277,10 +277,10 @@ We also require that $S$ does not contain any vertices from the heads,
 and every vertex in the tail must be in either $S$ or $B$.
 %
 \Cref{fig:decomp} shows two ways of choosing a separator (shaded in light blue)
-of a Hydra.
+of a hydra.
 
-Notice that $H[A \cup S]$ is seen as another Hydra with $S$ being its tail.
-If we contract all vertices of a Hydra except the tail,
+Notice that $H[A \cup S]$ is seen as another hydra with $S$ being its tail.
+If we contract all vertices of a hydra except the tail,
 we will have one vertex ($x$) left and possibly red edges ($E_x$) emanating from it.
 %
 We then take the rest of the trigraph with vertex $x$, i.e. $H[B \cup S \cup \{x\}]$,
@@ -289,7 +289,7 @@ Now $x$ and $S$ forms a new head, and we can build up the contraction sequence.
 %
 As red edges reside only in heads,
 if the size of separators are bounded by $d$,
-the red degree of a Hydra is also upper-bounded by $d$,
+the red degree of a hydra is also upper-bounded by $d$,
 which helps construct a $d$-contraction sequence part by part.
 %
 For $d=1$ we use a linear-time algorithm to find a vertex separator,
@@ -328,7 +328,7 @@ The following is a brief description of each algorithm ((*): using a SAT solver)
         \item \lbsample : Sampling-based algorithm.
         Finds a connected induced subgraph $G'$ of $G$
         by random walk and computes the exact or lower-bound twin-width of $G'$.
-        \item \lbseparate (*): Similar to \lbsample, but uses the Hydra decomposition to
+        \item \lbseparate (*): Similar to \lbsample, but uses the hydra decomposition to
         find an induced subgraph to check for the lower-bound.
     \end{itemize}
     \item Upper-bound algorithms
@@ -337,7 +337,7 @@ The following is a brief description of each algorithm ((*): using a SAT solver)
         % We add some randomness in later iterations.
         \item \ublocalsearch : Using the timeline encoding, we make small changes to
         the elimination ordering and the contraction tree to see if there is a better solution.
-        \item \ubseparate (*): Divide-and-conquer algorithm using the Hydra decomposition.
+        \item \ubseparate (*): Divide-and-conquer algorithm using the hydra decomposition.
     \end{itemize}
 \end{itemize}
 
