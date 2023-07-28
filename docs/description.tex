@@ -94,7 +94,57 @@ sequence, enabling faster local search;
 the hydra decomposition is a divide-and-conquer strategy featuring a small vertex separator.
 \end{abstract}
 
-\section{Background}
+\section{Introduction}
+Our solver functions by doing linear-time modular decomposition \cite{tedder_simple_2008}, and then processing each prime graph separately.
+%
+If the prime graph is a tree
+% (since every prime graph is connected,
+% it is enough to check if the number of edges is less than the number of vertices),
+we run \primetreesolver.
+%
+Otherwise, we run lower-bound and upper-bound algorithms alternatively
+until the bounds match, from the quickest algorithms to the slowest. 
+
+
+In this paper we will cover our more complex contributions to solving twin-width: ``timeline encoding'' and ``hydra decomposition''.
+%
+Timeline encoding is a data structure to compute the twin-width based on the number of red-edges (created by contracting nodes for twin-width) at any point in time through storing what intervals that edges are red when red edges become red (red sources).
+%
+Hydra decomposition is a divide-and-conquer strategy using vertex separators.
+%
+For details on the rest of our contributions to solving twinwidth see $<$TODO: Insert Link Here$>$, or the following brief description of each algorithm ((*): using a SAT solver).
+
+\begin{itemize}
+	\item Exact algorithms
+	\begin{itemize}
+		\item \primetreesolver : Linear-time exact solver for trees without twins.
+		\item \branchsolver : Brute-force solver equipped with caching mechanism and reduction rules.
+		\item \directsolver (*): SAT-based solver implementing the relative encoding presented in \cite{schidler_sat_2021}.
+	\end{itemize}
+	\item Lower-bound algorithms
+	\begin{itemize}
+		\item \lbgreedy : Greedily removes a vertex $u$ from the graph $G$
+		such that $|\triangle(u,v)|$ is minimized for some $v$.
+		Reports the maximum value of $\displaystyle \min_{u,v \in V(G), u \neq v} |\triangle_{G} (u,v)|$.
+		\item \lbcore (*): SAT-based algorithm to find 
+		$\displaystyle \max_{S \subseteq V(G)} \min_{u,v \in S, u \neq v} |\triangle_{G[S]} (u,v)|$.
+		\item \lbsample : Sampling-based algorithm.
+		Finds a connected induced subgraph $G'$ of $G$
+		by random walk and computes the exact or lower-bound twin-width of $G'$.
+		\item \lbseparate (*): Similar to \lbsample, but uses the hydra decomposition to
+		find an induced subgraph to check for the lower-bound.
+	\end{itemize}
+	\item Upper-bound algorithms
+	\begin{itemize}
+		\item \ubgreedy : Iteratively contract a vertex pair minimizing the weak red potential.
+		% We add some randomness in later iterations.
+		\item \ublocalsearch : Using the timeline encoding, we make small changes to
+		the elimination ordering and the contraction tree to see if there is a better solution.
+		\item \ubseparate (*): Divide-and-conquer algorithm using the hydra decomposition.
+	\end{itemize}
+\end{itemize}
+
+\section{Preliminary Information}
 \label{sec:background}
 
 We follow standard graph-theoretic notation (e.g. found in \cite{diestel2017graph}),
@@ -296,51 +346,6 @@ which helps construct a $d$-contraction sequence part by part.
 For $d=1$ we use a linear-time algorithm to find a vertex separator,
 or a cut vertex (articulation point).
 For $d \geq 2$, we call a SAT solver to find such ones.
-
-\section{Algorithms}
-
-At a high level, the solver first performs linear-time modular decomposition \cite{tedder_simple_2008},
-and processes each prime graph.
-%
-If the prime graph is a tree
-% (since every prime graph is connected,
-% it is enough to check if the number of edges is less than the number of vertices),
-we run \primetreesolver.
-%
-Otherwise, we run lower-bound and upper-bound algorithms alternatively
-until the bounds match.
-%
-The following is a brief description of each algorithm ((*): using a SAT solver).
-
-\begin{itemize}
-    \item Exact algorithms
-    \begin{itemize}
-        \item \primetreesolver : Linear-time exact solver for trees without twins.
-        \item \branchsolver : Brute-force solver equipped with caching mechanism and reduction rules.
-        \item \directsolver (*): SAT-based solver implementing the relative encoding presented in \cite{schidler_sat_2021}.
-    \end{itemize}
-    \item Lower-bound algorithms
-    \begin{itemize}
-        \item \lbgreedy : Greedily removes a vertex $u$ from the graph $G$
-        such that $|\triangle(u,v)|$ is minimized for some $v$.
-        Reports the maximum value of $\displaystyle \min_{u,v \in V(G), u \neq v} |\triangle_{G} (u,v)|$.
-        \item \lbcore (*): SAT-based algorithm to find 
-        $\displaystyle \max_{S \subseteq V(G)} \min_{u,v \in S, u \neq v} |\triangle_{G[S]} (u,v)|$.
-        \item \lbsample : Sampling-based algorithm.
-        Finds a connected induced subgraph $G'$ of $G$
-        by random walk and computes the exact or lower-bound twin-width of $G'$.
-        \item \lbseparate (*): Similar to \lbsample, but uses the hydra decomposition to
-        find an induced subgraph to check for the lower-bound.
-    \end{itemize}
-    \item Upper-bound algorithms
-    \begin{itemize}
-        \item \ubgreedy : Iteratively contract a vertex pair minimizing the weak red potential.
-        % We add some randomness in later iterations.
-        \item \ublocalsearch : Using the timeline encoding, we make small changes to
-        the elimination ordering and the contraction tree to see if there is a better solution.
-        \item \ubseparate (*): Divide-and-conquer algorithm using the hydra decomposition.
-    \end{itemize}
-\end{itemize}
 
 % \footnote{%
 % If there are multiple prime graphs,
